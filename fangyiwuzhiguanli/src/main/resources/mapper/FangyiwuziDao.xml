@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangyiwuziDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangyiwuzi_uuid_number as fangyiwuziUuidNumber
+        ,a.fangyiwuzi_name as fangyiwuziName
+        ,a.fangyiwuzi_photo as fangyiwuziPhoto
+        ,a.fangyiwuzi_types as fangyiwuziTypes
+        ,a.fangyiwuzi_kucun_number as fangyiwuziKucunNumber
+        ,a.fangyiwuzi_content as fangyiwuziContent
+        ,a.fangyiwuzi_delete as fangyiwuziDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangyiwuziView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+
+        FROM fangyiwuzi  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.fangyiwuziUuidNumber != '' and params.fangyiwuziUuidNumber != null and params.fangyiwuziUuidNumber != 'null' ">
+                and a.fangyiwuzi_uuid_number like CONCAT('%',#{params.fangyiwuziUuidNumber},'%')
+            </if>
+            <if test=" params.fangyiwuziName != '' and params.fangyiwuziName != null and params.fangyiwuziName != 'null' ">
+                and a.fangyiwuzi_name like CONCAT('%',#{params.fangyiwuziName},'%')
+            </if>
+            <if test="params.fangyiwuziTypes != null and params.fangyiwuziTypes != ''">
+                and a.fangyiwuzi_types = #{params.fangyiwuziTypes}
+            </if>
+            <if test="params.fangyiwuziKucunNumberStart != null and params.fangyiwuziKucunNumberStart != ''">
+                <![CDATA[  and a.fangyiwuzi_kucun_number >= #{params.fangyiwuziKucunNumberStart}   ]]>
+            </if>
+            <if test="params.fangyiwuziKucunNumberEnd != null and params.fangyiwuziKucunNumberEnd != ''">
+                <![CDATA[  and a.fangyiwuzi_kucun_number <= #{params.fangyiwuziKucunNumberEnd}   ]]>
+            </if>
+             <if test="params.fangyiwuziKucunNumber != null and params.fangyiwuziKucunNumber != ''">
+                and a.fangyiwuzi_kucun_number = #{params.fangyiwuziKucunNumber}
+             </if>
+            <if test=" params.fangyiwuziContent != '' and params.fangyiwuziContent != null and params.fangyiwuziContent != 'null' ">
+                and a.fangyiwuzi_content like CONCAT('%',#{params.fangyiwuziContent},'%')
+            </if>
+            <if test="params.fangyiwuziDeleteStart != null and params.fangyiwuziDeleteStart != ''">
+                <![CDATA[  and a.fangyiwuzi_delete >= #{params.fangyiwuziDeleteStart}   ]]>
+            </if>
+            <if test="params.fangyiwuziDeleteEnd != null and params.fangyiwuziDeleteEnd != ''">
+                <![CDATA[  and a.fangyiwuzi_delete <= #{params.fangyiwuziDeleteEnd}   ]]>
+            </if>
+             <if test="params.fangyiwuziDelete != null and params.fangyiwuziDelete != ''">
+                and a.fangyiwuzi_delete = #{params.fangyiwuziDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.FangyiwuziChuruInoutListDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.fangyiwuzi_churu_inout_id as fangyiwuziChuruInoutId
+        ,a.fangyiwuzi_id as fangyiwuziId
+        ,a.fangyiwuzi_churu_inout_list_number as fangyiwuziChuruInoutListNumber
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.FangyiwuziChuruInoutListView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,fangyiwuzi.fangyiwuzi_uuid_number as fangyiwuziUuidNumber
+        ,fangyiwuzi.fangyiwuzi_name as fangyiwuziName
+        ,fangyiwuzi.fangyiwuzi_photo as fangyiwuziPhoto
+        ,fangyiwuzi.fangyiwuzi_types as fangyiwuziTypes
+        ,fangyiwuzi.fangyiwuzi_kucun_number as fangyiwuziKucunNumber
+        ,fangyiwuzi.fangyiwuzi_content as fangyiwuziContent
+        ,fangyiwuzi.fangyiwuzi_delete as fangyiwuziDelete
+        ,fangyiwuziChuruInout.fangyiwuzi_churu_inout_uuid_number as fangyiwuziChuruInoutUuidNumber
+        ,fangyiwuziChuruInout.fangyiwuzi_churu_inout_name as fangyiwuziChuruInoutName
+        ,fangyiwuziChuruInout.fangyiwuzi_churu_inout_types as fangyiwuziChuruInoutTypes
+        ,fangyiwuziChuruInout.fangyiwuzi_churu_inout_content as fangyiwuziChuruInoutContent
+
+        FROM fangyiwuzi_churu_inout_list  a
+        left JOIN fangyiwuzi fangyiwuzi ON a.fangyiwuzi_id = fangyiwuzi.id
+        left JOIN fangyiwuzi_churu_inout fangyiwuziChuruInout ON a.fangyiwuzi_churu_inout_id = fangyiwuziChuruInout.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.fangyiwuziChuruInoutId != null and params.fangyiwuziChuruInoutId != ''">
+                and (
+                    a.fangyiwuzi_churu_inout_id = #{params.fangyiwuziChuruInoutId}
+                )
+            </if>
+            <if test="params.fangyiwuziId != null and params.fangyiwuziId != ''">
+                and (
+                    a.fangyiwuzi_id = #{params.fangyiwuziId}
+                )
+            </if>
+            <if test="params.fangyiwuziChuruInoutListNumberStart != null and params.fangyiwuziChuruInoutListNumberStart != ''">
+                <![CDATA[  and a.fangyiwuzi_churu_inout_list_number >= #{params.fangyiwuziChuruInoutListNumberStart}   ]]>
+            </if>
+            <if test="params.fangyiwuziChuruInoutListNumberEnd != null and params.fangyiwuziChuruInoutListNumberEnd != ''">
+                <![CDATA[  and a.fangyiwuzi_churu_inout_list_number <= #{params.fangyiwuziChuruInoutListNumberEnd}   ]]>
+            </if>
+             <if test="params.fangyiwuziChuruInoutListNumber != null and params.fangyiwuziChuruInoutListNumber != ''">
+                and a.fangyiwuzi_churu_inout_list_number = #{params.fangyiwuziChuruInoutListNumber}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断物资的id不为空 -->
+            <if test=" params.fangyiwuziIdNotNull != '' and params.fangyiwuziIdNotNull != null and params.fangyiwuziIdNotNull != 'null' ">
+                and a.fangyiwuzi_id IS NOT NULL
+            </if>
+            <if test=" params.fangyiwuziUuidNumber != '' and params.fangyiwuziUuidNumber != null and params.fangyiwuziUuidNumber != 'null' ">
+                and fangyiwuzi.fangyiwuzi_uuid_number like CONCAT('%',#{params.fangyiwuziUuidNumber},'%')
+            </if>
+            <if test=" params.fangyiwuziName != '' and params.fangyiwuziName != null and params.fangyiwuziName != 'null' ">
+                and fangyiwuzi.fangyiwuzi_name like CONCAT('%',#{params.fangyiwuziName},'%')
+            </if>
+            <if test="params.fangyiwuziTypes != null  and params.fangyiwuziTypes != ''">
+                and fangyiwuzi.fangyiwuzi_types = #{params.fangyiwuziTypes}
+            </if>
+
+            <if test="params.fangyiwuziKucunNumberStart != null  and params.fangyiwuziKucunNumberStart != '' ">
+                <![CDATA[  and fangyiwuzi.fangyiwuzi_kucun_number >= #{params.fangyiwuziKucunNumberStart}   ]]>
+            </if>
+            <if test="params.fangyiwuziKucunNumberEnd != null  and params.fangyiwuziKucunNumberEnd != '' ">
+                <![CDATA[  and fangyiwuzi.fangyiwuzi_kucun_number <= #{params.fangyiwuziKucunNumberEnd}   ]]>
+            </if>
+            <if test="params.fangyiwuziKucunNumber != null  and params.fangyiwuziKucunNumber != '' ">
+                and fangyiwuzi.fangyiwuzi_kucun_number = #{params.fangyiwuziKucunNumber}
+            </if>
+            <if test=" params.fangyiwuziContent != '' and params.fangyiwuziContent != null and params.fangyiwuziContent != 'null' ">
+                and fangyiwuzi.fangyiwuzi_content like CONCAT('%',#{params.fangyiwuziContent},'%')
+            </if>
+            <if test="params.fangyiwuziDeleteStart != null  and params.fangyiwuziDeleteStart != '' ">
+                <![CDATA[  and fangyiwuzi.fangyiwuzi_delete >= #{params.fangyiwuziDeleteStart}   ]]>
+            </if>
+            <if test="params.fangyiwuziDeleteEnd != null  and params.fangyiwuziDeleteEnd != '' ">
+                <![CDATA[  and fangyiwuzi.fangyiwuzi_delete <= #{params.fangyiwuziDeleteEnd}   ]]>
+            </if>
+            <if test="params.fangyiwuziDelete != null  and params.fangyiwuziDelete != '' ">
+                and fangyiwuzi.fangyiwuzi_delete = #{params.fangyiwuziDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(fangyiwuzi.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(fangyiwuzi.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+                <!-- 判断出入库的id不为空 -->
+            <if test=" params.fangyiwuziChuruInoutIdNotNull != '' and params.fangyiwuziChuruInoutIdNotNull != null and params.fangyiwuziChuruInoutIdNotNull != 'null' ">
+                and a.fangyiwuzi_churu_inout_id IS NOT NULL
+            </if>
+            <if test=" params.fangyiwuziChuruInoutUuidNumber != '' and params.fangyiwuziChuruInoutUuidNumber != null and params.fangyiwuziChuruInoutUuidNumber != 'null' ">
+                and fangyiwuziChuruInout.fangyiwuzi_churu_inout_uuid_number like CONCAT('%',#{params.fangyiwuziChuruInoutUuidNumber},'%')
+            </if>
+            <if test=" params.fangyiwuziChuruInoutName != '' and params.fangyiwuziChuruInoutName != null and params.fangyiwuziChuruInoutName != 'null' ">
+                and fangyiwuziChuruInout.fangyiwuzi_churu_inout_name like CONCAT('%',#{params.fangyiwuziChuruInoutName},'%')
+            </if>
+            <if test="params.fangyiwuziChuruInoutTypes != null  and params.fangyiwuziChuruInoutTypes != ''">
+                and fangyiwuziChuruInout.fangyiwuzi_churu_inout_types = #{params.fangyiwuziChuruInoutTypes}
+            </if>
+
+            <if test=" params.fangyiwuziChuruInoutContent != '' and params.fangyiwuziChuruInoutContent != null and params.fangyiwuziChuruInoutContent != 'null' ">
+                and fangyiwuziChuruInout.fangyiwuzi_churu_inout_content like CONCAT('%',#{params.fangyiwuziChuruInoutContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(fangyiwuziChuruInout.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(fangyiwuziChuruInout.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
